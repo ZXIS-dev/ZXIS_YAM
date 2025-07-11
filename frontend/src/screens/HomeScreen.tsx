@@ -6,7 +6,7 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RootStackParamList } from '../navigation/StackNavigator';
 import type { TabParamList } from '../navigation/TabNavigator';
-
+import {restaurants, foods} from '../data/foods';
 //그리드뷰 넓이 계산
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
@@ -21,9 +21,9 @@ type Props = CompositeScreenProps<
 >;
 
 const HomeScreen: React.FC<Props> = ({navigation}) => {
-    /* ① 현재 선택된 레스토랑 id 보관 */
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string>('1');  // 초기값 '손가네'
-    /* ② 선택된 레스토랑 메뉴만 필터링 */
+    //현재 선택된 레스토랑 id 보관
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string>('1');  // 초기값
+    //선택된 레스토랑 메뉴만 필터링
   const filteredFoods = useMemo(
     () => foods.filter(f => f.restaurantId === selectedRestaurant),
     [selectedRestaurant],
@@ -77,7 +77,9 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
             >
               <Image 
                 source={typeof item.img==='number' ? item.img : {uri: item.img}} 
-                style={styles.foodImg} />
+                style={styles.foodImg}
+                resizeMode='contain'
+                 />
               <Text style={styles.foodName}>{item.name}</Text>
               <Text style={styles.foodPrice}>{item.price.toLocaleString()}원</Text>
             </TouchableOpacity>
@@ -136,99 +138,3 @@ export default HomeScreen;
     fontWeight: 'bold',
   },
   });
-
-// 더미 데이터 (추후에 DB 연동 예정)
-const restaurants = [
-  { id: '1', name: '손가네' },
-  { id: '2', name: '홍콩반점' },
-  { id: '3', name: '홍춘' },
-  { id: '4', name: '고래심줄' },
-  { id: '5', name: '인도네팔'}
-];
-
-const foods = [
-  {
-    id: 'f1',
-    restaurantId: '1',
-    name: '칼국수',
-    price: 5500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f2',
-    restaurantId: '1',
-    name: '비빔밥',
-    price: 6500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f3',
-    name: '김치찌개',
-    restaurantId: '1',
-    price: 4500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f4',
-    name: '제육 볶음',
-    restaurantId: '1',
-    price: 12000,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f5',
-    name: '김치찌개',
-    restaurantId: '1',
-    price: 4500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f6',
-    name: '제육 볶음',
-    restaurantId: '1',
-    price: 12000,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f7',
-    restaurantId: '2',
-    name: '칼국수',
-    price: 5500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f8',
-    restaurantId: '2',
-    name: '비빔밥',
-    price: 6500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f9',
-    name: '김치찌개',
-    restaurantId: '2',
-    price: 4500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f10',
-    name: '제육 볶음',
-    restaurantId: '2',
-    price: 12000,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f11',
-    name: '김치찌개',
-    restaurantId: '2',
-    price: 4500,
-    img: require('../assets/noodle.png'),
-  },
-  {
-    id: 'f12',
-    name: '제육 볶음',
-    restaurantId: '2',
-    price: 12000,
-    img: require('../assets/noodle.png'),
-  },
-];
