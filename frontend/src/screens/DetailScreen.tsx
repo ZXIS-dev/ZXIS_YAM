@@ -6,21 +6,29 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale } from 'react-native-size-matters';
 import { foods } from '../data/foods';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from 'src/navigation/StackNavigator';
+import { NativeStackNavigationProp, type NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/StackNavigator';
+import { useCart } from '../context/CartContext';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Detail'>;
 
-const ToppingItem = React.memo(({ label }: { label: string }) => {
-  const [checked, setChecked] = useState(false);
+type ToppingItemProps = {
+  label : string;
+  checked: boolean;
+  onToggle: () => void;
+};
+//토핑 체크박스 UI
+const ToppingItem = React.memo(({ label, checked, onToggle }: ToppingItemProps) => {
   return (
     <TouchableOpacity
       style={styles.checkitem}
-      onPress={() => setChecked(!checked)}
+      onPress={onToggle}
     >
       <View style={[styles.checkbox, checked && styles.checkedBox]}>
         {checked && <Text style={styles.checkmark}>✔</Text>}
@@ -30,14 +38,55 @@ const ToppingItem = React.memo(({ label }: { label: string }) => {
   );
 });
 
+
 const DetailScreen: React.FC<Props> = ({ route }) => {
+  //Id에 따라 음식 데이터 받아오기
   const { foodId } = route.params;
   const food = foods.find(f => f.id === foodId);
   if (!food) return null;
-
+  //네비게이트
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  //배열에 선택한 토핑 저장
+  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
+  const toggleTopping = (label: string) => {
+    setSelectedToppings(prev =>
+      //배열에 이미 있으면 제거, 없으면 추가
+      prev.includes(label)
+        ? prev.filter(item => item !== label)
+        : [...prev, label]
+    );
+  };
+  //수량 in/decrease
   const [current, setCurrent] = useState(1);
   const increase = () => setCurrent(c => c + 1);
   const decrease = () => setCurrent(c => (c > 1 ? c - 1 : 1));
+
+  //Context 훅 사용해서 함수 가져오기
+  const {addToCart} = useCart(); 
+  //담기 버튼 데이터 수집
+  const handleAddToCart=() => {
+    const cartItem = {
+      id: food.id,
+      name: food.name,
+      price: food.price,
+      quantity: current,
+      toppings: selectedToppings,
+    };
+    addToCart(cartItem);//전역 상태에 저장
+    //약간의 딜레이 후 알람
+    setTimeout(() => {
+      Alert.alert(
+        '장바구니에 담겼습니다!',
+        '', //메시지
+        [{
+          text: '확인',
+          onPress: () => navigation.navigate('Tab'),
+        },]
+      ); 
+    }, 200);
+
+    console.log('장바구니로 넘길 데이터:', cartItem); //디버깅용
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -67,15 +116,24 @@ const DetailScreen: React.FC<Props> = ({ route }) => {
 
           <View style={styles.toppingContainer}>
             <Text style={styles.toppingText}>토핑 추가</Text>
-            <ToppingItem label="김가루 추가" />
-            <ToppingItem label="깨 추가" />
+            {/* 추후 데이터 연동 시 동적 할당으로 수정 예정*/}
+            <ToppingItem 
+              label="김가루 추가" 
+              checked={selectedToppings.includes('김가루 추가')} //checked는 체크표시 할지말지 결정
+              onToggle={() => toggleTopping('김가루 추가')}
+            />
+            <ToppingItem 
+              label="깨 추가" 
+              checked={selectedToppings.includes('깨 추가')}
+              onToggle={() => toggleTopping('깨 추가')}
+            />
           </View>
         </ScrollView>
 
         {/* ScrollView 밖에 두어야 고정됨 */}
         <View style={styles.bottomBar}>
-          <TouchableOpacity style={styles.cartButton}>
-            <Text style={styles.cartText}>{food.price.toLocaleString()}원 담기</Text>
+          <TouchableOpacity style={styles.cartButton} onPress={handleAddToCart}>
+            <Text style={styles.cartText}>{(food.price * current).toLocaleString()}원 담기</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -90,7 +148,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 200,
-    marginTop: 10,
     marginBottom: 40,
   },
   textContainer: {
