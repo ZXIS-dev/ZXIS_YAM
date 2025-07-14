@@ -1,4 +1,5 @@
 
+
 // 더미 데이터 (추후에 DB 연동 예정)
 export const restaurants = [
   { id: '1', name: '바비든든' },

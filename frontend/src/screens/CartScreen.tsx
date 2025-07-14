@@ -1,18 +1,14 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, } from 'react-native';
 import { useCart } from '../context/CartContext';
 import { moderateScale } from 'react-native-size-matters';
 import { foods } from '../data/foods';
+import { NativeStackNavigationProp, type NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/StackNavigator';
+import { useNavigation } from '@react-navigation/native';
 
-type Props = {
-  route: {
-    params: {
-      foodId: string;
-    };
-  };
-};
-const CartScreen = ({route}: Props) => {
-
+const CartScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { cartItems, removeFromCart, clearCart } = useCart(); // 추가된 함수 사용
   //총 금액 계산
   const totalPrice = cartItems.reduce((sum, item) => {
@@ -56,13 +52,14 @@ const CartScreen = ({route}: Props) => {
                 </TouchableOpacity>
               </View>
           )}}
+          contentContainerStyle={{paddingBottom: moderateScale(90)}}
         />
         <View style={styles.tpContainer}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>총금액</Text>
           <Text style={styles.totalText}>{totalPrice.toLocaleString()}원</Text>
         </View>
-        <TouchableOpacity style={styles.payContainer}>
+        <TouchableOpacity style={styles.payContainer} onPress ={() => navigation.navigate('Pay')}>
           <Text style={styles.payText}>결제하기</Text>
         </TouchableOpacity>
       </View>
