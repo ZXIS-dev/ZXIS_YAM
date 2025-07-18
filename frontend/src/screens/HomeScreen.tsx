@@ -7,6 +7,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RootStackParamList } from '../navigation/StackNavigator';
 import type { TabParamList } from '../navigation/TabNavigator';
 import {restaurants, foods} from '../data/foods';
+import { moderateScale } from 'react-native-size-matters';
 //그리드뷰 넓이 계산
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
@@ -118,8 +119,11 @@ export default HomeScreen;
     foodCard: {
       width: ITEM_WIDTH,
       borderRadius: 8,
-      marginTop : 10,
+      marginTop : 8,
       alignItems: 'center',
+      backgroundColor: 'white',
+      elevation: 3,
+      paddingHorizontal: moderateScale(10)
     },
     foodImg: {
     width: '100%',
@@ -127,12 +131,13 @@ export default HomeScreen;
     borderRadius: 6,
   },
   foodName: {
-    marginTop: 6,
+    marginTop: 1,
     fontSize: 14,
     fontWeight: '600',
   },
   foodPrice: {
     marginTop: 2,
+    marginBottom:5,
     fontSize: 15,
     color: 'black',
     fontWeight: 'bold',
