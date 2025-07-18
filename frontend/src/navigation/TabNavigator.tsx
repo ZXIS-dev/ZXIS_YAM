@@ -1,9 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from '../screens/HomeScreen';
 import CartScreen from '../screens/CartScreen';
 import OrderScreen from '../screens/OrderScreen';
+import { moderateScale } from 'react-native-size-matters';
 
 export type TabParamList = {
   Home: undefined;
@@ -25,26 +26,26 @@ const TabNavigator = () => {
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
           backgroundColor: '#fff',
-          paddingBottom: 5,
+          paddingTop: moderateScale(3),
           height: 60,
         },
-        tabBarIcon: ({ color, size, focused }) => {
+        tabBarIcon: ({ color, size }) => {
   let iconName: string;
 
   switch (route.name) {
     case 'Home':
-      iconName = focused ? 'ios-home'  : 'ios-home-outline';
+      iconName = 'home';
       break;
     case 'Cart':
-      iconName = focused ? 'ios-cart'  : 'ios-cart-outline';
+      iconName = 'shopping-cart';
       break;
     case 'Orders':
-      iconName = focused ? 'ios-list'  : 'ios-list-outline';
+      iconName = 'list-alt';
       break;
     default:
-      iconName = 'alert';        // 안전용 - 항상 값 할당
+      iconName = 'error';
   }
-  return <Ionicons name={iconName} size={size} color={color} />;
+  return <Icon name={iconName} size={size} color={color} />;
 }
       })}
     >
