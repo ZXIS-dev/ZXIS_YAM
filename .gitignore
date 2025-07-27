@@ -145,12 +145,6 @@ android/build/
 *.keystore
 
 # iOS
-ios/Pods/
-ios/build/
-ios/DerivedData/
-*.xcworkspace
-*.xcodeproj
-*.xcuserstate
 
 # Watchman
 .watchmanconfig
