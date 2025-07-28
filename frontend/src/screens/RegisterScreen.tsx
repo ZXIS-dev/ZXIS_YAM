@@ -36,7 +36,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
     try {
-      const response = await fetch(`${API_DEVICE_URL}/signup`, {
+      const response = await fetch(`${API_DEVICE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id, pw, name, phone}),
@@ -57,7 +57,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const handleCheckId = async() => {
 
     try {
-      const response = await fetch(`${API_DEVICE_URL}/checked-id`, {
+      const response = await fetch(`${API_DEVICE_URL}/api/auth/checked-id`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id, pw, name, phone}),

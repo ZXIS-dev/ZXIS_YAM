@@ -35,7 +35,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleLogin = async() => {
     try {
-      const response = await fetch(`${API_DEVICE_URL}/login`, {
+      const response = await fetch(`${API_DEVICE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify({id, pw}),

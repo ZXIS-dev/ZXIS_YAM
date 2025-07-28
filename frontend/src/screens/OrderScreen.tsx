@@ -21,7 +21,7 @@ const OrderScreen: React.FC<Props> = ({route, navigation}) => {
   const [userName, setUserName] = useState('');
   const getProfile = async () => {
     const token = await AsyncStorage.getItem('token');
-    const response = await fetch(`${API_DEVICE_URL}/profile`, {
+    const response = await fetch(`${API_DEVICE_URL}/api/auth/profile`, {
       method: 'GET',
       headers: {
         'Authorization' : `bearer ${token}`,
