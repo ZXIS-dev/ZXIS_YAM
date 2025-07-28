@@ -10,6 +10,7 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
 import { dummyUsers } from '../data/userDB';
+import { API_DEVICE_URL } from '@env';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -21,40 +22,65 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [idChecked, setIdChecked] = useState(false);
 
-  const handleCheckId = () => {
-    const exists = dummyUsers.find((user) => user.id === id);
-    if (exists) {
-      Alert.alert('중복된 아이디', '이미 존재하는 아이디입니다.');
-      setIdChecked(false);
-    } else if (!id.trim()) {
-      Alert.alert('입력 오류', '아이디를 입력해주세요.');
-      setIdChecked(false);
-    } else {
-      Alert.alert('사용 가능', '사용할 수 있는 아이디입니다.');
-      setIdChecked(true);
-    }
-  };
-
-  const handleRegister = () => {
-    if (!id || !pw || !pwConfirm || !name || !phone) {
+  const handleSignup = async() => {
+    if (!id || !pw || !name || !phone) {
       Alert.alert('입력 오류', '모든 항목을 입력해주세요.');
       return;
     }
-
     if (!idChecked) {
-      Alert.alert('아이디 확인', '아이디 중복 확인을 해주세요.');
+      Alert.alert('아이디 확인', '아이디 중복확인을 해주세요.');
       return;
     }
-
     if (pw !== pwConfirm) {
       Alert.alert('비밀번호 불일치', '비밀번호가 일치하지 않습니다.');
       return;
     }
+    try {
+      const response = await fetch(`${API_DEVICE_URL}/signup`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, pw, name, phone}),
+      });
 
-    dummyUsers.push({ id, password: pw }); // 이름, 전화번호는 구조 확장 시 저장 가능
-    Alert.alert('회원가입 완료', '로그인 화면으로 이동합니다.');
-    navigation.replace('Login');
+      const data = await response.json(); //서버 응답 파싱
+      if (data.success) {
+        Alert.alert('회원가입 완료', data.message);
+        navigation.replace('Login');
+      } else {
+        Alert.alert('회원가입 실패', data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert('오류', '오류가 발생했습니다.');
+    }
   };
+  const handleCheckId = async() => {
+
+    try {
+      const response = await fetch(`${API_DEVICE_URL}/checked-id`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, pw, name, phone}),
+      });
+      const data = await response.json();
+      if (data.success) {
+        if (data.exists) {
+          Alert.alert('중복된 아이디', data.message);
+        } else {
+          Alert.alert('사용 가능', data.message);
+          setIdChecked(true);
+        }
+      } else {
+        Alert.alert('입력 오류', data.message);
+      }
+      
+    } catch (err) {
+      console.error(err);
+      Alert.alert('오류', '오류가 발생했습니다.');
+    }
+  };
+
+
 
   return (
     <View style={styles.container}>
@@ -66,7 +92,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           value={id}
           onChangeText={(text) => {
             setId(text);
-            setIdChecked(false);
           }}
           style={[styles.input, { flex: 1, marginRight: 8 }]}
           placeholderTextColor="#999"
@@ -108,7 +133,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+      <TouchableOpacity style={styles.registerButton} onPress={handleSignup}>
         <Text style={styles.registerButtonText}>회원가입</Text>
       </TouchableOpacity>
     </View>
