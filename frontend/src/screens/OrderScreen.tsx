@@ -36,6 +36,8 @@ const OrderScreen: React.FC<Props> = ({route, navigation}) => {
   }
   const logOut = async() => {
     await AsyncStorage.removeItem('token');
+    const token = await AsyncStorage.getItem('token');
+    console.log('로그아웃 후 토큰', token);
     navigation.replace('Login')
   }
   return (

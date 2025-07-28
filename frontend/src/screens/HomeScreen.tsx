@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, Dimensions, TouchableOpacity} from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CompositeScreenProps } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import type { RootStackParamList } from '../navigation/StackNavigator';
 import type { TabParamList } from '../navigation/TabNavigator';
 import {restaurants, foods} from '../data/foods';
 import { moderateScale } from 'react-native-size-matters';
+import { useCart } from '../context/CartContext';
 //그리드뷰 넓이 계산
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
@@ -22,6 +23,12 @@ type Props = CompositeScreenProps<
 >;
 
 const HomeScreen: React.FC<Props> = ({navigation}) => {
+  const {cartItems, loadCartFromServer} = useCart();
+  
+  //홈 화면 진입 시 서버의 장바구니를 불러옴
+  useEffect(() => {
+    loadCartFromServer();
+  }, []);
     //현재 선택된 레스토랑 id 보관
   const [selectedRestaurant, setSelectedRestaurant] = useState<string>('1');  // 초기값
     //선택된 레스토랑 메뉴만 필터링
