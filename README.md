@@ -49,11 +49,14 @@ cd frontend
 npm install
 ```
 
+
+
 ### ▶ 실행 (Android)
 
 ```bash
 npx react-native run-android
 ```
+> ⚠ 실행 전 `.env` 설정이 필요 (아래 4번 참고)
 
 ##  3. 백엔드 실행 (Node.js + Express)
 
@@ -63,6 +66,8 @@ npx react-native run-android
 cd ../backend
 npm install
 ```
+
+
 
 ### ▶ 서버 실행
 
@@ -79,12 +84,51 @@ npx nodemon index.js
 ```bash
 npm run dev //보통 이걸로 하면 됨
 ```
+> ⚠ 실행 전 `.env` 설정이 필요 (아래 4번 참고)
 
+## 4. 환경변수 설정 (.env)
 
-## 4. API 테스트 예시
+프론트엔드와 백엔드는 각각 별도의 `.env` 파일이 필요합니다.
+아래 명령어로 예시 파일인 '.env.example'을 복사해 `.env`를 생성하고, 각 항목을 환경에 맞게 수정하세요.
 
-- 기본 URL: \`http://localhost:3000\`
-- 예시 엔드포인트: \`http://localhost:3000/api/hello\`
+### frontend/.env
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+```env
+API_DEVICE_URL=http://YOUR_LOCAL_IP:3000
+API_EMULATOR_URL=http://10.0.2.2:3000
+```
+
+- `API_DEVICE_URL`: 실제 디바이스에서 사용할 백엔드 주소 (같은 Wi-Fi 내 IP)
+- `API_EMULATOR_URL`: Android 에뮬레이터에서 사용할 백엔드 주소 (`10.0.2.2` 고정)
+
+---
+
+### backend/.env
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+```env
+PORT=3000
+JWT_SECRET=your_jwt_secret_key_here
+```
+
+- `PORT`: 서버 실행 포트 (기본 3000)
+- `JWT_SECRET`: JWT 서명을 위한 비밀 키. 아무 문자열이나 가능
+
+> `.env` 파일은 보안상 Git에 커밋되지 않으며, 직접 생성해야 합니다.
+
+---
+
+## 5. API 테스트 예시
+
+- 기본 URL: `http://localhost:3000`
+- 예시 엔드포인트: `http://localhost:3000/api/hello`
 
 ---
 
