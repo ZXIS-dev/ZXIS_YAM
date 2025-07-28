@@ -1,6 +1,5 @@
 // src/screens/LoginScreen.tsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,22 +10,54 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/StackNavigator';
-import { dummyUsers } from '../data/userDB';
+import AsyncStorage from '@react-native-async-storage/async-storage'; //토큰 저장을 위함
+import { API_DEVICE_URL } from '@env';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
+  
+  //로그인한 사용자 확인 - 추후에 splashScreen에 넣기
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        navigation.replace('Tab');
+      }
+    };
+    checkToken();
+    console.log('API URL', API_DEVICE_URL);
+    console.log('typeof env:', typeof API_DEVICE_URL); // 이건 실제로 값이 안 들어올 때 확인
+  }, []);
+
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
 
-  const handleLogin = () => {
-    const found = dummyUsers.find((user) => user.id === id && user.password === pw);
-    if (found) {
+  const handleLogin = async() => {
+    try {
+      const response = await fetch(`${API_DEVICE_URL}/login`, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({id, pw}),
+      });
+
+    const data = await response.json();
+    console.log('서버 응답:', data);
+
+    if (data.success) {
+      Alert.alert('로그인 성공', `${data.name}님 환영합니다!`);
       navigation.replace('Tab');
+      await AsyncStorage.setItem('token', data.token); //로컬에 영구적으로 토큰 저장
+      console.log('토큰: ',data.token);
     } else {
-      Alert.alert('로그인 실패', '아이디 또는 비밀번호가 틀렸습니다.');
+      Alert.alert('로그인 실패', data.message);
     }
-  };
+    } catch (err) {
+      console.error(err);
+      Alert.alert('오류', '오류가 발생했습니다.');
+    }
+  }
+
 
   return (
     <View style={styles.container}>

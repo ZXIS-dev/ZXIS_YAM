@@ -14,8 +14,12 @@
     "baseUrl": "./",  // 상대 경로 기준을 설정
     "paths": {
       "@react-navigation/*": ["node_modules/@react-navigation/*"]  // 경로 해결을 명확히 함
-    }
+    },
   },
+  "include": [
+    "src",
+    "env.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "babel.config.js",
