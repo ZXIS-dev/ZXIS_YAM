@@ -44,6 +44,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         value={pw}
         onChangeText={setPw}
         secureTextEntry
+        textContentType="newPassword" // iOS에서 자동완성 기능을 제어
         style={styles.input}
         placeholderTextColor="#999"
       />
