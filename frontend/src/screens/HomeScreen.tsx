@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useMemo } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, Dimensions, TouchableOpacity} from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, Dimensions, TouchableOpacity, Platform} from 'react-native'; // Platform API import
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -122,7 +122,17 @@ export default HomeScreen;
       marginTop : 8,
       alignItems: 'center',
       backgroundColor: 'white',
+      // 안드로이드는 elevation으로 그림자 효과를 냅니다.
       elevation: 3,
+      // iOS에서는 shadow 속성들을 사용하여 그림자 효과를 냅니다.
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        },
+      }),
       paddingHorizontal: moderateScale(10)
     },
     foodImg: {
