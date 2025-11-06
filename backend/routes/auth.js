@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       {id: user.id, name: user.name}, //payload
       JWT_SECRET,
-      {expiresIn: '1h'} //유효기간
+      {expiresIn: '1m'} //유효기간
     )
     //로그인 성공 시 이름, 전화번호, 토큰도 같이 반환함
     res.json({
@@ -90,5 +90,11 @@ router.get('/profile', authenticateToken, (req, res) => {
     }
   })
 })
-
+router.get('/verify', authenticateToken, (req, res) => {
+  return res.json({
+    success: true,
+    message: '토큰이 유효합니다.',
+    user: req.user, // decode 된 payload
+  });
+});
 module.exports = router;

@@ -64,7 +64,7 @@ const DetailScreen: React.FC<Props> = ({ route }) => {
   //Context 훅 사용해서 함수 가져오기
   const {addToCart} = useCart(); 
   //담기 버튼 데이터 수집
-  const handleAddToCart=() => {
+  const handleAddToCart =async () => {
     const cartItem = {
       id: food.id,
       name: food.name,
@@ -72,20 +72,24 @@ const DetailScreen: React.FC<Props> = ({ route }) => {
       quantity: current,
       toppings: selectedToppings,
     };
-    addToCart(cartItem);//전역 상태에 저장
+    const success = await addToCart(cartItem);//전역 상태에 저장
+    if (success) {
     //약간의 딜레이 후 알람
-    setTimeout(() => {
-      Alert.alert(
-        '장바구니에 담겼습니다!',
-        '', //메시지
-        [{
-          text: '확인',
-          onPress: () => navigation.navigate('Tab'),
-        },]
-      ); 
-    }, 200);
+      setTimeout(() => {
+        Alert.alert(
+          '장바구니에 담겼습니다!',
+          '', //메시지
+          [{
+            text: '확인',
+            onPress: () => navigation.navigate('Tab'),
+          },]
+        ); 
+      }, 200);
+      console.log('장바구니로 넘길 데이터:', cartItem); //디버깅용
+    } else {
+      Alert.alert('추가 실패', '서버 문제로 장바구니 담기에 실패하였습니다.')
+    }
 
-    console.log('장바구니로 넘길 데이터:', cartItem); //디버깅용
   };
 
   return (

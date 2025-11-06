@@ -5,6 +5,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import TabNavigator from './TabNavigator';
 import PayScreen from '../screens/PayScreen';
+import PayResultScreen from '../screens/PayResultScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -12,6 +13,7 @@ export type RootStackParamList = {
   Tab: undefined;
   Detail: {foodId: string};
   Pay: undefined;
+  PayResult: {orderId: string; estimatedTime: string};
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -37,6 +39,7 @@ export default function StackNavigator() {
         <Stack.Screen name = "Tab" component={TabNavigator} options={{headerShown:false}}/>
         <Stack.Screen name="Detail" component={DetailScreen} options={{title: 'YAM', headerTintColor:'white'}} />
         <Stack.Screen name="Pay" component={PayScreen} options={{title: '결제하기', headerTintColor: 'white'}}/>
+        <Stack.Screen name="PayResult" component={PayResultScreen} options={{headerShown:false}}/>
     </Stack.Navigator>
   );
 }
