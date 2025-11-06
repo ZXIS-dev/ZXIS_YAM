@@ -2,19 +2,37 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView} from 'react-native';
 import { useCart } from '../context/CartContext';
 import { moderateScale } from 'react-native-size-matters';
-
+import { NativeStackNavigationProp, type NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/StackNavigator';
+import { useOrders } from '../context/OrderContext';
+type Props = NativeStackScreenProps<RootStackParamList, 'Pay'>;
 type PaymentMethod = '신용/체크카드' | '카카오페이' | '토스페이';
 
 const paymentMethods: PaymentMethod[] = ['신용/체크카드', '카카오페이', '토스페이'];
 
-const PayScreen = () => {
+const PayScreen: React.FC<Props> = ({navigation}) => {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('신용/체크카드');
-  const {cartItems} = useCart();
+  const {cartItems, clearCart} = useCart();
+  const {addOrder} = useOrders();
   const handlePayment = () => {
-    Alert.alert('결제 완료', `${selectedMethod}로 결제가 완료되었습니다.`);
+    const orderId = Math.floor(Math.random() * (1000-500 + 1)) + 500;
+    
+    addOrder({
+      orderId: orderId.toString(),
+      items: cartItems,
+      totalPrice,
+      paymentMethod: selectedMethod,
+      createdAt: new Date()
+    });
+    navigation.navigate('PayResult', {
+      orderId: orderId.toString(),
+      estimatedTime: '5분',
+    });
+    clearCart();
   };
-  const totalPrice = cartItems.reduce((sum, item) => {
-  return sum + item.price * item.quantity;
+
+const totalPrice = cartItems.reduce((sum, item) => {
+   return sum + item.price * item.quantity;
 }, 0);
 
   return (

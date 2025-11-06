@@ -17,18 +17,28 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   
-  //로그인한 사용자 확인 - 추후에 splashScreen에 넣기
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        navigation.replace('Tab');
+ useEffect(() => {
+  const checkToken = async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) return; // 토큰 없으면 로그인 유지
+
+    try {
+      const res = await fetch(`${API_DEVICE_URL}/api/auth/verify`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        navigation.replace('Tab'); // 토큰 유효하면 메인 진입
+      } else {
+        await AsyncStorage.removeItem('token'); // 만료되면 삭제
       }
-    };
-    checkToken();
-    console.log('API URL', API_DEVICE_URL);
-    console.log('typeof env:', typeof API_DEVICE_URL); // 이건 실제로 값이 안 들어올 때 확인
-  }, []);
+    } catch (err) {
+      console.error('토큰 확인 실패', err);
+      await AsyncStorage.removeItem('token');
+    }
+  };
+  checkToken();
+}, []);
 
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
