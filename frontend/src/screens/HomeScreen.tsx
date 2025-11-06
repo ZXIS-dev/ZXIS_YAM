@@ -1,0 +1,152 @@
+import React from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, Image, Dimensions, TouchableOpacity} from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { RootStackParamList } from '../navigation/StackNavigator';
+import type { TabParamList } from '../navigation/TabNavigator';
+import {restaurants, foods} from '../data/foods';
+import { moderateScale } from 'react-native-size-matters';
+import { useCart } from '../context/CartContext';
+//그리드뷰 넓이 계산
+const screenWidth = Dimensions.get('window').width;
+const ITEM_MARGIN = 12;
+const NUM_COLUMNS = 2;
+const H_PADDING = 32;
+const ITEM_WIDTH = (screenWidth - H_PADDING * 2 - ITEM_MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
+
+//타입 지정(Compisite은 Stack, Tab 둘 다 커버 가능)
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'Home'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+const HomeScreen: React.FC<Props> = ({navigation}) => {
+  const {cartItems, loadCartFromServer} = useCart();
+  
+  //홈 화면 진입 시 서버의 장바구니를 불러옴
+  useEffect(() => {
+    loadCartFromServer();
+  }, []);
+    //현재 선택된 레스토랑 id 보관
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string>('1');  // 초기값
+    //선택된 레스토랑 메뉴만 필터링
+  const filteredFoods = useMemo(
+    () => foods.filter(f => f.restaurantId === selectedRestaurant),
+    [selectedRestaurant],
+  );
+
+  return (
+    <View style = {styles.container}>
+      {/*음식점 리스트*/}
+      <FlatList
+          data={restaurants}
+          keyExtractor={(item) => item.id}
+          horizontal //가로 배치
+          showsHorizontalScrollIndicator={false} //스크롤바 숨김
+          contentContainerStyle={{ paddingHorizontal: 5 }}
+
+          renderItem={({ item }) => {
+          const active = item.id === selectedRestaurant;
+          return (
+            <TouchableOpacity
+              style={styles.restaurantsContainer}
+              onPress={() => setSelectedRestaurant(item.id)}
+            >
+              <Text style={[
+                styles.restaurantsItem,
+                { color: active ? '#004898' : 'gray' },
+              ]}>
+                {item.name}
+              </Text>
+              {active && <View style={styles.indicator} />}
+            </TouchableOpacity>
+          );
+        }}
+      />
+      <FlatList
+          data={filteredFoods} //필터링된 음식 배열
+          keyExtractor={(item)=>item.id}
+          numColumns={2}
+          contentContainerStyle={{
+            paddingHorizontal:5,
+            paddingBottom:20,
+          }}
+          columnWrapperStyle={{
+            justifyContent: 'space-between',
+            marginBottom: 16,
+          }}
+          renderItem={({item}) => (
+            <TouchableOpacity 
+            style={styles.foodCard}
+            //DetailScreen으로 이동, footid 넘김
+            onPress={() => navigation.navigate('Detail', {foodId: item.id})}
+            >
+              <Image 
+                source={typeof item.img==='number' ? item.img : {uri: item.img}} 
+                style={styles.foodImg}
+                resizeMode='contain'
+                 />
+              <Text style={styles.foodName}>{item.name}</Text>
+              <Text style={styles.foodPrice}>{item.price.toLocaleString()}원</Text>
+            </TouchableOpacity>
+          )
+          }
+      />
+    </View>
+  );
+}
+export default HomeScreen;
+
+  const styles = StyleSheet.create ({
+    container: {
+      flex: 1,
+      paddingHorizontal: 5,
+      backgroundColor: '#F0F0F3',
+      margin: 8,
+    },
+    restaurantsContainer: {
+      alignItems: 'center',
+    marginHorizontal: 12,
+    marginTop:10,
+    marginBottom: 10,
+    },
+    indicator: {
+      marginTop:4,
+      width: '100%',
+      height: 2,
+      backgroundColor: '#004898',
+      borderRadius: 1,
+    },
+    restaurantsItem: {
+      fontSize: 15,
+    fontWeight: 'bold',
+    },
+    foodCard: {
+      width: ITEM_WIDTH,
+      borderRadius: 8,
+      marginTop : 8,
+      alignItems: 'center',
+      backgroundColor: 'white',
+      elevation: 3,
+      paddingHorizontal: moderateScale(10)
+    },
+    foodImg: {
+    width: '100%',
+    height: ITEM_WIDTH,
+    borderRadius: 6,
+  },
+  foodName: {
+    marginTop: 1,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  foodPrice: {
+    marginTop: 2,
+    marginBottom:5,
+    fontSize: 15,
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  });
